@@ -1,23 +1,43 @@
 import torch
 import random
 import numpy as np
+import matplotlib.pyplot as plt
+from IPython import display
 from collections import deque
-from game import SnakeGame, Direction, Point, BLOCK_SIZE, SPEED
+from game import SnakeGame, Direction, Point, BLOCK_SIZE
+from model import Linear_QNet, QTrainer
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
-LR = 0.001
+
+plt.ion()
+
+def plot(plot_scores, plot_mean_scores):
+    display.clear_output(wait=True)
+    display.display(plt.gcf())
+    plt.clf()
+    plt.title('Training...')
+    plt.xlabel('Number of Games')
+    plt.ylabel('Score')
+    plt.plot(plot_scores)
+    plt.plot(plot_mean_scores)
+    plt.ylim(ymin=0)
+    plt.text(len(plot_scores)-1, plot_scores[-1], str(plot_scores[-1]))
+    plt.text(len(plot_mean_scores)-1, plot_mean_scores[-1], str(plot_mean_scores[-1]))
+    plt.show(block=False)
+    plt.pause(.1)
+
 
 class Agent:
     
     def __init__(self):
         self.n_games = 0 # number of games played
         self.epsilon = 0 # randomness
-        self.gamma = 0 # discount rate (how much we care about future reward)
+        self.gamma = 0.9 # discount rate (how much we care about future reward) TODO: try different discount rates
         self.memory = deque(maxlen=MAX_MEMORY)
         
-        self.model = None
-        self.trainer = None
+        self.model = Linear_QNet(11, 256, 3) # 11 - size of inpput layer (state with 11 features), 256 - size of hidden layer, 3 - size of output layer (3 possible moves), TODO: try different hidden layer sizes
+        self.trainer = QTrainer(self.model, lr=0.001, gamma=self.gamma) # TODO: try different learning rates
     
     def get_state(self, game):
         # points around the head
@@ -64,7 +84,6 @@ class Agent:
             game.food.y < game.head.y,  # food up
             game.food.y > game.head.y  # food down
             ]
-        print(np.array(state, dtype=int))
         return np.array(state, dtype=int)        
         
         
@@ -92,17 +111,16 @@ class Agent:
             final_move[move] = 1
         else: # get action from model
             state0 = torch.tensor(state, dtype=torch.float) # convert our current state to a tensor
-            prediction = self.model.predict(state0) # get the prediction from the model
+            prediction = self.model(state0) # get the prediction from the model (runs the forward method in model.py)
             move = torch.argmax(prediction).item() # convert the prediction to a viable move
             final_move[move] = 1 # set the move to 1 to execute it
             
         return final_move
 
 def train():
-    # TODO: plot
+    # stuff for plotting
     plot_scores = []
     plot_mean_scores = []
-    
     total_score = 0
     record = 0 # best score
     
@@ -135,12 +153,17 @@ def train():
             # updating best score
             if score > record:
                 record = score
-                # agent.model.save()
+                agent.model.save()
 
             print('Game', agent.n_games, 'Score', score, 'Record', record)
             
-            # TODO: plot
+            plot_scores.append(score)
+            total_score += score
+            mean_score = total_score / agent.n_games
+            plot_mean_scores.append(mean_score)
+            plot(plot_scores, plot_mean_scores)
                 
+
     
 if __name__ == '__main__':
     train()
