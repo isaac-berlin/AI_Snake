@@ -93,7 +93,7 @@ class SnakeGame:
         # 6. return game over and score
         return game_over, self.score
     
-    def _is_collision(self):
+    def is_collision(self):
         # hits boundary
         if self.head.x > self.w - BLOCK_SIZE or self.head.x < 0 or self.head.y > self.h - BLOCK_SIZE or self.head.y < 0:
             return True
