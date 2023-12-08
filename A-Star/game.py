@@ -1,10 +1,17 @@
 import pygame
 import random
+import os
 from enum import Enum
 from collections import namedtuple
 
+# Get the directory of the current Python script
+current_directory = os.path.dirname(__file__)
+
+# Path to the 'arial.ttf' file in the same directory as the script
+font_path = os.path.join(current_directory, 'arial.ttf')
+
 pygame.init()
-font = pygame.font.Font('arial.ttf', 25)
+font = pygame.font.Font(font_path, 25)
 #font = pygame.font.SysFont('arial', 25)
 
 class Direction(Enum):
@@ -129,7 +136,9 @@ if __name__ == '__main__':
     
     # game loop
     while True:
-        game_over, score = game.play_step()
+        action = random.randint(1,4) # random move (Direction.RIGHT, LEFT, UP, DOWN) == (1,2,3,4)
+        # TODO: Modify action to be the A-Star path to the apple
+        game_over, score = game.play_step(action)
         
         if game_over == True:
             break
