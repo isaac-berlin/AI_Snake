@@ -3,6 +3,25 @@ import random
 import os
 from enum import Enum
 from collections import namedtuple
+import matplotlib.pyplot as plt
+from IPython import display
+
+plt.ion()
+
+def plot(plot_scores, plot_mean_scores):
+    display.clear_output(wait=True)
+    display.display(plt.gcf())
+    plt.clf()
+    plt.title('Training...')
+    plt.xlabel('Number of Games')
+    plt.ylabel('Score')
+    plt.plot(plot_scores)
+    plt.plot(plot_mean_scores)
+    plt.ylim(ymin=0)
+    plt.text(len(plot_scores)-1, plot_scores[-1], str(plot_scores[-1]))
+    plt.text(len(plot_mean_scores)-1, plot_mean_scores[-1], str(plot_mean_scores[-1]))
+    plt.show(block=False)
+    plt.pause(.1)
 
 # Get the directory of the current Python script
 current_directory = os.path.dirname(__file__)
@@ -30,7 +49,7 @@ BLUE2 = (0, 100, 255)
 BLACK = (0,0,0)
 
 BLOCK_SIZE = 20
-SPEED = 20
+SPEED = 400
 
 class SnakeGame:
     
@@ -53,6 +72,20 @@ class SnakeGame:
         self.score = 0
         self.food = None
         self._place_food()
+        
+    def reset(self):
+        # init game state
+        self.direction = Direction.RIGHT
+        
+        self.head = Point(self.w/2, self.h/2)
+        self.snake = [self.head, 
+                      Point(self.head.x-BLOCK_SIZE, self.head.y),
+                      Point(self.head.x-(2*BLOCK_SIZE), self.head.y)]
+        
+        self.score = 0
+        self.food = None
+        self._place_food()
+        self.frame_iteration = 0
         
     # places a food block at a random position on the screen
     def _place_food(self):
@@ -184,17 +217,47 @@ class SnakeGame:
         self.clock.tick(SPEED)  # Control game speed
         return False, self.score  # Return game status and score
 
-if __name__ == '__main__':
-    game = SnakeGame() # initialize a Snake game
+def play_game():
+    # stuff for plotting
+    plot_scores = []
+    plot_mean_scores = []
+    total_score = 0
+    record = 0 # best score
+    num_games_played = 0
     
-    # game loop
+    game = SnakeGame() # initialize the game
+    
     while True:
         game_over, score = game.play_step() # play_step plays the game... returns game_over and score
-        
-        if game_over == True:
-            break
-        
-    print('Final Score', score)
-        
-        
+        if game_over:
+            # train long memory, plot result
+            game.reset()
+            num_games_played += 1
+            
+            # updating best score
+            if score > record:
+                record = score
+
+            print('Game', num_games_played, 'Score', score, 'Record', record)
+            
+            plot_scores.append(score)
+            total_score += score
+            mean_score = total_score / num_games_played
+            plot_mean_scores.append(mean_score)
+            plot(plot_scores, plot_mean_scores)
+            
+            if num_games_played == 10:
+                plt.savefig('A-Star_10iterations.png')
+            elif num_games_played == 100:
+                plt.savefig('A-Star_100iterations.png')
+            elif num_games_played == 1000:
+                plt.savefig('A-Star_1000iterations.png')
+            elif num_games_played == 10000:
+                plt.savefig('A-Star_10000iterations.png')
+            
+            if num_games_played >= 10000: # stop after 10000 games
+                break
+
+if __name__ == '__main__':
+    play_game()
     pygame.quit()
