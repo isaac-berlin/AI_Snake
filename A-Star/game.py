@@ -54,45 +54,15 @@ class SnakeGame:
         self.food = None
         self._place_food()
         
+    # places a food block at a random position on the screen
     def _place_food(self):
         x = random.randint(0, (self.w-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE 
         y = random.randint(0, (self.h-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE
         self.food = Point(x, y)
         if self.food in self.snake:
             self._place_food()
-        
-    def play_step(self, action):
-        # 1. collect user input
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-
-        
-        # 2. move
-        self._move(action) # update the head
-        self.snake.insert(0, self.head)
-        
-        # 3. check if game over
-        game_over = False
-        if self.is_collision():
-            game_over = True
-            return game_over, self.score
-            
-        # 4. place new food or just move
-        if self.head == self.food:
-            self.score += 1
-            self._place_food()
-        else:
-            self.snake.pop()
-        
-        # 5. update ui and clock
-        self._update_ui()
-        self.clock.tick(SPEED)
-        # 6. return game over and score
-        return game_over, self.score
     
+    # returns True if game over (collision with snake or wall), else False
     def is_collision(self):
         # hits boundary
         if self.head.x > self.w - BLOCK_SIZE or self.head.x < 0 or self.head.y > self.h - BLOCK_SIZE or self.head.y < 0:
@@ -129,16 +99,97 @@ class SnakeGame:
             y -= BLOCK_SIZE
             
         self.head = Point(x, y)
-            
+    
+    # heuristic function        
+    def _manhattan_distance(self, start, goal): 
+        return abs(start.x - goal.x) + abs(start.y - goal.y)
+    
+    # A* algorithm (modified to include obstacles) (ChatGPT implementation)
+    def _a_star(self):
+        open_list = [self.head]
+        came_from = {}
+        g_score = {point: float('inf') for point in self.snake}
+        g_score[self.head] = 0
+        f_score = {point: float('inf') for point in self.snake}
+        f_score[self.head] = self._manhattan_distance(self.head, self.food)
+
+        while open_list:
+            current = min(open_list, key=lambda point: f_score[point])
+
+            if current == self.food:
+                path = []
+                while current in came_from:
+                    path.insert(0, current)
+                    current = came_from[current]
+                return path
+
+            open_list.remove(current)
+
+            for neighbor in [
+                Point(current.x + BLOCK_SIZE, current.y),
+                Point(current.x - BLOCK_SIZE, current.y),
+                Point(current.x, current.y + BLOCK_SIZE),
+                Point(current.x, current.y - BLOCK_SIZE),
+            ]:
+                if (
+                    0 <= neighbor.x < self.w
+                    and 0 <= neighbor.y < self.h
+                    and neighbor not in self.snake[1:]  # Exclude snake body from obstacles
+                ):
+                    if neighbor not in g_score:
+                        g_score[neighbor] = float('inf')
+
+                    tentative_g_score = g_score[current] + 1
+
+                    if tentative_g_score < g_score[neighbor]:
+                        came_from[neighbor] = current
+                        g_score[neighbor] = tentative_g_score
+                        f_score[neighbor] = (
+                            g_score[neighbor] + self._manhattan_distance(neighbor, self.food)
+                        )
+                        if neighbor not in open_list:
+                            open_list.append(neighbor)
+
+        return []
+    
+    def play_step(self):
+        action = Direction.RIGHT  # Default action if no path found
+
+        path = self._a_star() # Use the a* algorithm to find the path to the food
+        if path:
+            next_point = path[0]
+            if next_point.x < self.head.x:
+                action = Direction.LEFT
+            elif next_point.x > self.head.x:
+                action = Direction.RIGHT
+            elif next_point.y < self.head.y:
+                action = Direction.UP
+            elif next_point.y > self.head.y:
+                action = Direction.DOWN
+
+        self._move(action)  # Move the snake based on the determined action (from a*)
+        self.snake.insert(0, self.head)  # Update the snake's position
+
+        game_over = self.is_collision()  # Check if the snake has collided with itself or the wall
+        if game_over:
+            return True, self.score
+
+        if self.head == self.food: # Check if the snake has eaten the food
+            self.score += 1
+            self._place_food()
+        else:
+            self.snake.pop()  # Remove the tail segment if no food is eaten
+
+        self._update_ui()  # Update the game display
+        self.clock.tick(SPEED)  # Control game speed
+        return False, self.score  # Return game status and score
 
 if __name__ == '__main__':
-    game = SnakeGame()
+    game = SnakeGame() # initialize a Snake game
     
     # game loop
     while True:
-        action = random.randint(1,4) # random move (Direction.RIGHT, LEFT, UP, DOWN) == (1,2,3,4)
-        # TODO: Modify action to be the A-Star path to the apple
-        game_over, score = game.play_step(action)
+        game_over, score = game.play_step() # play_step plays the game... returns game_over and score
         
         if game_over == True:
             break
