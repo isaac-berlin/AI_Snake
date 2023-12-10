@@ -162,7 +162,15 @@ def train():
             mean_score = total_score / agent.n_games
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
-                
+            
+            if agent.n_games == 10:
+                plt.savefig('DQN_10iterations.png')
+            elif agent.n_games == 100:
+                plt.savefig('DQN_100iterations.png')
+            elif agent.n_games == 1000:
+                plt.savefig('DQN_1000iterations.png')
+            elif agent.n_games == 10000:
+                plt.savefig('DQN_10000iterations.png')    
 
     
 if __name__ == '__main__':
