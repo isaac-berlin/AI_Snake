@@ -49,7 +49,7 @@ BLUE2 = (0, 100, 255)
 BLACK = (0,0,0)
 
 BLOCK_SIZE = 20
-SPEED = 400
+SPEED = 100000 # modify this to change the speed of the game
 
 class SnakeGame:
     
@@ -247,13 +247,13 @@ def play_game():
             plot(plot_scores, plot_mean_scores)
             
             if num_games_played == 10:
-                plt.savefig('A-Star_10iterations.png')
+                plt.savefig('A_Star_10iterations.png')
             elif num_games_played == 100:
-                plt.savefig('A-Star_100iterations.png')
+                plt.savefig('A_Star_100iterations.png')
             elif num_games_played == 1000:
-                plt.savefig('A-Star_1000iterations.png')
+                plt.savefig('A_Star_1000iterations.png')
             elif num_games_played == 10000:
-                plt.savefig('A-Star_10000iterations.png')
+                plt.savefig('A_Star_10000iterations.png')
             
             if num_games_played >= 10000: # stop after 10000 games
                 break
