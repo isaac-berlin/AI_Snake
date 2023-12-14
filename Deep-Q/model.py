@@ -70,9 +70,3 @@ class QTrainer:
         loss = self.criterion(target, pred) # calculate loss
         loss.backward() # backpropagation
         self.optimizer.step() # update weights
-            
-        
-        
-
-        
-        
