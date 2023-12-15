@@ -32,4 +32,4 @@ If you want to play the game yourself without any AI, you can run the ```snake_g
 
 ### The Snake Game Implementation Credit
 
-The Snake game implementation found here is originally credited to [Patrick Loeber](https://github.com/patrickloeber/python-fun/tree/master/snake-pygame). You can explore the original implementation [here](https://github.com/patrickloeber/python-fun/tree/master/snake-pygame) or watch a detailed explanation in [this video](https://www.youtube.com/watch?v=L8ypSXwyBds&t=2420s).
+The Snake game implementation found here is originally credited to [Patrick Loeber](https://github.com/patrickloeber). You can explore the original implementation [here](https://github.com/patrickloeber/python-fun/tree/master/snake-pygame) or watch a detailed explanation in [this video](https://www.youtube.com/watch?v=L8ypSXwyBds).
