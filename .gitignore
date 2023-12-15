@@ -161,3 +161,9 @@ cython_debug/
 
 # pytorch model data
 model/
+
+# pdf data
+*.pdf
+
+# keep results folder
+!Results/*.pdf
