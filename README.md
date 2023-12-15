@@ -15,7 +15,7 @@ This codebase is part of an in-depth research study examining deterministic and 
 
 ### Detailed Research Findings
 
-For detailed insights, analysis, and comprehensive results, explore the [full research paper](/Results/Results.pdf) available in the "[Results](/Results)" folder of this repository. The research paper provides extensive details on our experimental methodologies, findings, and conclusions drawn from the comparison between the A* algorithm and the deep-q neural network in playing the Snake game.
+For detailed insights, analysis, and comprehensive results, explore the [full research paper](Results/Results.pdf) available in the "[Results](/Results)" folder of this repository. The research paper provides extensive details on our experimental methodologies, findings, and conclusions drawn from the comparison between the A* algorithm and the deep-q neural network in playing the Snake game.
 
 ### Running the Code
 
