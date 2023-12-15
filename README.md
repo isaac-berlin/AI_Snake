@@ -18,6 +18,17 @@ This codebase is part of an in-depth research study examining deterministic and 
 For detailed insights, analysis, and comprehensive results, explore the [full research paper](Results/Results.pdf) available in the "[Results](Results)" folder of this repository. The research paper provides extensive details on our experimental methodologies, findings, and conclusions drawn from the comparison between the A* algorithm and the deep-q neural network in playing the Snake game.
 
 ### Running the Code
+To run the code, you will need to install the following dependencies as specified in the [requirements.txt](requirements.txt) file:
+
+The main dependencies are:
+- Python (3.11.5)
+- Pygame
+- PyTorch
+- MatPlotLib.pyplot
+- IPython
+
+To run the Deep-Q Neural Network you need to run the ```agent.py``` file in the [Deep-Q](Deep-Q) directory. To run the A-Star Algorithm you need to run the ```game.py``` file in the [A-Star](A-Star) directory. 
+If you want to play the game yourself without any AI, you can run the ```snake_game_human.py``` file in the root directory.
 
 ### The Snake Game Implementation Credit
 
